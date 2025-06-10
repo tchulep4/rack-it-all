@@ -2,11 +2,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import ProfileMenu from '@/components/layout/ProfileMenu';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <header className="border-b px-6 py-3 bg-white flex items-center justify-between">
@@ -24,6 +30,18 @@ const Header = () => {
         <Button variant="ghost" size="icon">
           <Bell className="h-5 w-5" />
         </Button>
+        
+        {user && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Olá, {user.name}
+            </span>
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        
         <ProfileMenu />
       </div>
     </header>

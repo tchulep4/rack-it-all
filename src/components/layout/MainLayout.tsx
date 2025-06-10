@@ -2,6 +2,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
+import Watermark from '@/components/layout/Watermark';
 
 const MainLayout = () => {
   return (
@@ -13,6 +14,7 @@ const MainLayout = () => {
           <Outlet />
         </main>
       </div>
+      <Watermark />
     </div>
   );
 };

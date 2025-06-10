@@ -19,12 +19,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Check, X } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 const Licenses = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [licenseKeyInput, setLicenseKeyInput] = useState("");
+  const [validationResult, setValidationResult] = useState<'valid' | 'invalid' | null>(null);
+  const { toast } = useToast();
 
   // Filter licenses based on search query
   const filteredLicenses = licenses.filter((license) => {
@@ -36,6 +41,30 @@ const Licenses = () => {
         license.contractNumber.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   });
+
+  const validateLicenseKey = () => {
+    if (!licenseKeyInput.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira uma chave de licença",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate license key format (simplified validation)
+    const isValid = /^(TRL|STD|ENT)-[A-Z]{3}-[A-Z0-9]{6}-[A-Z0-9]{8}$/.test(licenseKeyInput.trim());
+    
+    setValidationResult(isValid ? 'valid' : 'invalid');
+    
+    toast({
+      title: isValid ? "Licença Válida" : "Licença Inválida",
+      description: isValid 
+        ? "A chave de licença é válida e autêntica" 
+        : "A chave de licença não é válida ou está malformada",
+      variant: isValid ? "default" : "destructive"
+    });
+  };
 
   const getProgressColor = (usedSeats: number, totalSeats: number): string => {
     const usagePercentage = (usedSeats / totalSeats) * 100;
@@ -108,6 +137,47 @@ const Licenses = () => {
           <Plus className="mr-2 h-4 w-4" /> Add License
         </Button>
       </div>
+
+      {/* License Key Validation Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Validador de Licenças</CardTitle>
+          <CardDescription>
+            Insira uma chave de licença para validar sua autenticidade
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Ex: STD-RAC-ABC123-DEF45678"
+              value={licenseKeyInput}
+              onChange={(e) => setLicenseKeyInput(e.target.value)}
+              className="flex-1"
+            />
+            <Button onClick={validateLicenseKey}>
+              Validar
+            </Button>
+          </div>
+          
+          {validationResult && (
+            <Alert className={`mt-4 ${validationResult === 'valid' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+              <div className="flex items-center gap-2">
+                {validationResult === 'valid' ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <X className="h-4 w-4 text-red-600" />
+                )}
+                <AlertDescription className={validationResult === 'valid' ? 'text-green-800' : 'text-red-800'}>
+                  {validationResult === 'valid' 
+                    ? 'Licença válida - Gerada por 2lecybersec.com' 
+                    : 'Licença inválida ou formato incorreto'
+                  }
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="pb-3">

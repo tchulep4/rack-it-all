@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 import {
   LayoutDashboard,
   Monitor,
@@ -12,7 +13,8 @@ import {
   Settings,
   BarChart3,
   Menu,
-  X
+  X,
+  Shield
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,6 +23,7 @@ interface SidebarProps {
 
 const Sidebar = ({ className }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, hasRole } = useAuth();
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
@@ -53,8 +56,27 @@ const Sidebar = ({ className }: SidebarProps) => {
         <NavItem to="/licenses" icon={<Key size={20} />} label="Licenses" collapsed={collapsed} />
         <NavItem to="/reports" icon={<BarChart3 size={20} />} label="Reports" collapsed={collapsed} />
         <NavItem to="/users" icon={<Users size={20} />} label="Users" collapsed={collapsed} />
+        
+        {hasRole('admin') && (
+          <NavItem 
+            to="/admin" 
+            icon={<Shield size={20} />} 
+            label="Administração" 
+            collapsed={collapsed} 
+          />
+        )}
+        
         <NavItem to="/settings" icon={<Settings size={20} />} label="Settings" collapsed={collapsed} />
       </nav>
+
+      {!collapsed && user && (
+        <div className="p-4 border-t border-sidebar-border">
+          <div className="text-sm">
+            <p className="font-medium">{user.name}</p>
+            <p className="text-sidebar-foreground/70 capitalize">{user.role}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

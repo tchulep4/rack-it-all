@@ -82,6 +82,19 @@ export interface License {
   contactEmail?: string;
   createdAt: string;
   updatedAt: string;
+  isGenerated?: boolean;
+  generatedBy?: string;
+  licenseKey?: string;
+  watermark?: string;
+}
+
+// Generated License Types
+export interface GeneratedLicense extends License {
+  isGenerated: true;
+  generatedBy: string;
+  watermark: string;
+  licenseType: 'trial' | 'full' | 'enterprise';
+  duration?: number; // in days
 }
 
 // User Types
@@ -97,4 +110,23 @@ export interface User {
   lastLogin?: string;
   createdAt: string;
   active: boolean;
+}
+
+// Auth Types
+export interface AuthUser {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  department?: string;
+}
+
+export interface AuthContext {
+  user: AuthUser | null;
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  hasRole: (role: UserRole) => boolean;
 }
